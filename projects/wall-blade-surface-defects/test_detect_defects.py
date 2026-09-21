@@ -4,7 +4,7 @@ import unittest
 import cv2
 import numpy as np
 
-path = Path(__file__).parents[1] / "detect_defects.py"
+path = Path(__file__).resolve().parent / "detect_defects.py"
 spec = importlib.util.spec_from_file_location("detect_defects", path)
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
