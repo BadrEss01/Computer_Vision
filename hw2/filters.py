@@ -1,167 +1,82 @@
+"""Small image-filtering utilities used by the coursework notebooks.
+
+The functions deliberately keep the assignment's same-image-size convention:
+zero padding is applied around the input and the kernel is centered.
+"""
 import numpy as np
 
 
 def conv_nested(image, kernel):
-    """A naive implementation of convolution filter.
-
-    This is a naive implementation of convolution using 4 nested for-loops.
-    This function computes convolution of an image with a kernel and outputs
-    the result that has the same shape as the input image.
-
-    Args:
-        image: numpy array of shape (Hi, Wi).
-        kernel: numpy array of shape (Hk, Wk).
-
-    Returns:
-        out: numpy array of shape (Hi, Wi).
-    """
-    Hi, Wi = image.shape
-    Hk, Wk = kernel.shape
-    out = np.zeros((Hi, Wi))
-
-    ### YOUR CODE HERE
-    pass
-    ### END YOUR CODE
-
+    image = np.asarray(image)
+    kernel = np.asarray(kernel)
+    hi, wi = image.shape
+    hk, wk = kernel.shape
+    padded = zero_pad(image, hk // 2, wk // 2)
+    flipped = np.flip(kernel)
+    out = np.zeros((hi, wi), dtype=np.result_type(image, kernel, float))
+    for y in range(hi):
+        for x in range(wi):
+            out[y, x] = np.sum(padded[y:y + hk, x:x + wk] * flipped)
     return out
+
 
 def zero_pad(image, pad_height, pad_width):
-    """ Zero-pad an image.
-
-    Ex: a 1x1 image [[1]] with pad_height = 1, pad_width = 2 becomes:
-
-        [[0, 0, 0, 0, 0],
-         [0, 0, 1, 0, 0],
-         [0, 0, 0, 0, 0]]         of shape (3, 5)
-
-    Args:
-        image: numpy array of shape (H, W).
-        pad_width: width of the zero padding (left and right padding).
-        pad_height: height of the zero padding (bottom and top padding).
-
-    Returns:
-        out: numpy array of shape (H+2*pad_height, W+2*pad_width).
-    """
-
-    H, W = image.shape
-    out = None
-
-    ### YOUR CODE HERE
-    pass
-    ### END YOUR CODE
-    return out
+    image = np.asarray(image)
+    if pad_height < 0 or pad_width < 0:
+        raise ValueError("padding must be non-negative")
+    return np.pad(image, ((pad_height, pad_height), (pad_width, pad_width)),
+                  mode="constant")
 
 
 def conv_fast(image, kernel):
-    """ An efficient implementation of convolution filter.
-
-    This function uses element-wise multiplication and np.sum()
-    to efficiently compute weighted sum of neighborhood at each
-    pixel.
-
-    Hints:
-        - Use the zero_pad function you implemented above
-        - There should be two nested for-loops
-        - You may find np.flip() and np.sum() useful
-
-    Args:
-        image: numpy array of shape (Hi, Wi).
-        kernel: numpy array of shape (Hk, Wk).
-
-    Returns:
-        out: numpy array of shape (Hi, Wi).
-    """
-    Hi, Wi = image.shape
-    Hk, Wk = kernel.shape
-    out = np.zeros((Hi, Wi))
-
-    ### YOUR CODE HERE
-    pass
-    ### END YOUR CODE
-
+    image = np.asarray(image)
+    kernel = np.asarray(kernel)
+    hi, wi = image.shape
+    hk, wk = kernel.shape
+    padded = zero_pad(image, hk // 2, wk // 2)
+    flipped = np.flip(kernel)
+    out = np.zeros((hi, wi), dtype=np.result_type(image, kernel, float))
+    for y in range(hi):
+        for x in range(wi):
+            out[y, x] = np.sum(padded[y:y + hk, x:x + wk] * flipped)
     return out
+
 
 def conv_faster(image, kernel):
-    """
-    Args:
-        image: numpy array of shape (Hi, Wi).
-        kernel: numpy array of shape (Hk, Wk).
+    # Vectorized implementation for odd-sized kernels.
+    image = np.asarray(image)
+    kernel = np.asarray(kernel)
+    hi, wi = image.shape
+    hk, wk = kernel.shape
+    if hk % 2 == 0 or wk % 2 == 0:
+        return conv_fast(image, kernel)
+    padded = zero_pad(image, hk // 2, wk // 2)
+    windows = np.lib.stride_tricks.sliding_window_view(padded, (hk, wk))
+    return np.einsum("ijkl,kl->ij", windows, np.flip(kernel))
 
-    Returns:
-        out: numpy array of shape (Hi, Wi).
-    """
-    Hi, Wi = image.shape
-    Hk, Wk = kernel.shape
-    out = np.zeros((Hi, Wi))
-
-    ### YOUR CODE HERE
-    pass
-    ### END YOUR CODE
-
-    return out
 
 def cross_correlation(f, g):
-    """ Cross-correlation of f and g.
+    return conv_fast(f, np.asarray(g))
 
-    Hint: use the conv_fast function defined above.
-
-    Args:
-        f: numpy array of shape (Hf, Wf).
-        g: numpy array of shape (Hg, Wg).
-
-    Returns:
-        out: numpy array of shape (Hf, Wf).
-    """
-
-    out = None
-    ### YOUR CODE HERE
-    pass
-    ### END YOUR CODE
-
-    return out
 
 def zero_mean_cross_correlation(f, g):
-    """ Zero-mean cross-correlation of f and g.
+    g = np.asarray(g)
+    return cross_correlation(f, g - np.mean(g))
 
-    Subtract the mean of g from g so that its mean becomes zero.
-
-    Hint: you should look up useful numpy functions online for calculating the mean.
-
-    Args:
-        f: numpy array of shape (Hf, Wf).
-        g: numpy array of shape (Hg, Wg).
-
-    Returns:
-        out: numpy array of shape (Hf, Wf).
-    """
-
-    out = None
-    ### YOUR CODE HERE
-    pass
-    ### END YOUR CODE
-
-    return out
 
 def normalized_cross_correlation(f, g):
-    """ Normalized cross-correlation of f and g.
-
-    Normalize the subimage of f and the template g at each step
-    before computing the weighted sum of the two.
-
-    Hint: you should look up useful numpy functions online for calculating 
-          the mean and standard deviation.
-
-    Args:
-        f: numpy array of shape (Hf, Wf).
-        g: numpy array of shape (Hg, Wg).
-
-    Returns:
-        out: numpy array of shape (Hf, Wf).
-    """
-
-    out = None
-    ### YOUR CODE HERE
-    pass
-    ### END YOUR CODE
-
+    f = np.asarray(f, dtype=float)
+    g = np.asarray(g, dtype=float)
+    hi, wi = f.shape
+    hk, wk = g.shape
+    padded = zero_pad(f, hk // 2, wk // 2)
+    out = np.zeros((hi, wi), dtype=float)
+    g0 = g - g.mean()
+    gnorm = np.linalg.norm(g0)
+    for y in range(hi):
+        for x in range(wi):
+            patch = padded[y:y + hk, x:x + wk]
+            p0 = patch - patch.mean()
+            pnorm = np.linalg.norm(p0)
+            out[y, x] = 0.0 if gnorm == 0 or pnorm == 0 else np.sum(p0 * g0) / (pnorm * gnorm)
     return out
