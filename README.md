@@ -1,6 +1,15 @@
-# Computer Vision Coursework
+# Computer vision
+
+> **Coursework + project extension** · Assignments in hw1–hw3; independent inspection baseline in projects/
+>
+> [Selected projects](https://github.com/BadrEss01/BadrEss#selected-projects) · [Coursework](https://github.com/BadrEss01/BadrEss/blob/main/COURSEWORK.md)
 
 Implementations and experiments from computer-vision coursework. The repository currently covers image manipulation, linear algebra, convolution and template matching, edge detection, Canny processing and Hough-transform voting.
+
+## Choose what to explore
+
+- **Coursework:** `hw1/`, `hw2/`, `hw3/` and their algorithm checks in `tests/`.
+- **Applied project:** [Surface-inspection baseline](projects/wall-blade-surface-defects/README.md), with its own detector and tests. This follow-up is separate from the historical assignments.
 
 ## Structure
 
