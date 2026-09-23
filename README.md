@@ -2,7 +2,7 @@
 
 > **Coursework + project extension** · Assignments in hw1–hw3; independent inspection baseline in projects/
 >
-> [Selected projects](https://github.com/BadrEss01/BadrEss#selected-projects) · [Coursework](https://github.com/BadrEss01/BadrEss/blob/main/COURSEWORK.md)
+> [Selected projects](https://github.com/BadrEss01/BadrEss01#selected-projects) · [Coursework](https://github.com/BadrEss01/BadrEss01/blob/main/COURSEWORK.md)
 
 Implementations and experiments from computer-vision coursework. The repository currently covers image manipulation, linear algebra, convolution and template matching, edge detection, Canny processing and Hough-transform voting.
 
@@ -45,4 +45,4 @@ This is coursework, not a claim of professional deployment. The implementations 
 
 ## Related robotics project
 
-[Wind-blade inspection overview](https://github.com/BadrEss01/BadrEss/tree/main/projects/wind-blade-inspection) explains the cooperative thesis and distinguishes the new image-only baseline from the historical robot prototype.
+[Wind-blade inspection overview](https://github.com/BadrEss01/BadrEss01/tree/main/projects/wind-blade-inspection) explains the cooperative thesis and distinguishes the new image-only baseline from the historical robot prototype.
