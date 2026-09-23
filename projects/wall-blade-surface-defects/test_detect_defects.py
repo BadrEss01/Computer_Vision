@@ -21,5 +21,22 @@ class SurfaceDefectTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             module.detect_defects(np.array([]))
 
+    def test_uniform_surface_has_no_candidates(self):
+        mask, boxes = module.detect_defects(np.full((80, 80), 150, dtype=np.uint8))
+        self.assertEqual(np.count_nonzero(mask), 0)
+        self.assertEqual(boxes, [])
+
+    def test_rejects_unsupported_image_formats(self):
+        for image in [np.ones((40, 40), dtype=float),
+                      np.zeros((40, 40, 4), dtype=np.uint8),
+                      np.zeros(40, dtype=np.uint8)]:
+            with self.subTest(shape=image.shape, dtype=image.dtype):
+                with self.assertRaises(ValueError):
+                    module.detect_defects(image)
+
+    def test_rejects_nonfinite_threshold(self):
+        with self.assertRaises(ValueError):
+            module.detect_defects(np.zeros((40, 40), dtype=np.uint8), threshold=float('nan'))
+
 if __name__ == "__main__":
     unittest.main()

@@ -23,11 +23,15 @@ def detect_defects(
     The method detects local grayscale contrast and should be treated as a
     screening baseline. It does not classify the cause of an anomaly.
     """
-    if image is None or image.size == 0:
+    if not isinstance(image, np.ndarray) or image.size == 0:
         raise ValueError("image must be a non-empty array")
+    if image.dtype != np.uint8:
+        raise ValueError("image must use uint8 pixels in the range 0–255")
+    if image.ndim not in (2, 3) or (image.ndim == 3 and image.shape[2] != 3):
+        raise ValueError("image must be grayscale or three-channel BGR")
     if blur_kernel < 3 or blur_kernel % 2 == 0:
         raise ValueError("blur_kernel must be odd and at least 3")
-    if threshold <= 0 or min_area < 1:
+    if not np.isfinite(threshold) or threshold <= 0 or min_area < 1:
         raise ValueError("threshold and min_area must be positive")
 
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) if image.ndim == 3 else image
@@ -62,7 +66,8 @@ def main() -> None:
     args = parser.parse_args()
     image = cv2.imread(str(args.image))
     mask, boxes = detect_defects(image)
-    cv2.imwrite(str(args.output), annotate(image, boxes))
+    if not cv2.imwrite(str(args.output), annotate(image, boxes)):
+        raise OSError(f"Could not write output image: {args.output}")
     print(f"candidate_regions={len(boxes)} mask_pixels={int(np.count_nonzero(mask))}")
 
 
